@@ -3,146 +3,99 @@
 // например: ‘Apple iPhone - $100’;
 // Для того что бы функция была вызвана в правильном контексте внутри декоратора ее нужно вызывать через
 // apply let origResult =  originalFunc.apply(this);
-
-function addItemInfoDecorator(target: Object, method: string, descriptor: PropertyDescriptor) {
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+function addItemInfoDecorator(target, method, descriptor) {
     let origFunc = descriptor.value;
-    descriptor.value = function() {
-        let origResult =  origFunc.apply(this);
+    descriptor.value = function () {
+        let origResult = origFunc.apply(this);
         this.date = new Date();
-        this.info = `${this.name} IPhone - ${this.price}$`
-    }
+        this.info = `${this.name} IPhone - ${this.price}$`;
+    };
 }
-
 class Item {
-    public price: number;
-    public name: string;
-    public date: string;
-    public info: string;
-
-    constructor(name: string, price: number) {
+    constructor(name, price) {
         this.name = name;
         this.price = price;
     }
-
-    @addItemInfoDecorator
-    public getItemInfo() {
+    getItemInfo() {
         return {
-            name: this.name, 
+            name: this.name,
             price: this.price
         };
     }
 }
-
+__decorate([
+    addItemInfoDecorator
+], Item.prototype, "getItemInfo", null);
 let item = new Item('Apple', 100);
 console.log(item.getItemInfo());
-
 // 2.Создать декоратор класса User. Он должен добавлять в данном классе поле createDate
 // датой создания класса а также добавлять поле type в котором будет записана строка ‘admin’ или ‘user’
 // данную строку нужно передать в декоратор при вызове. Сам класс и имя декоратора может быть произвольным.
-
-function addUserDecorator(type: string) {
-    return function(targetClass) {
+function addUserDecorator(type) {
+    return function (targetClass) {
         return class {
-            public createDate = new Date();
-            public type: string = type;
-        }
-    }
+            constructor() {
+                this.createDate = new Date();
+                this.type = type;
+            }
+        };
+    };
 }
-
-@addUserDecorator('user')
-class User {
-
-}
-
-const user = new User()
-
-// 3. Есть два апи для получения и работы с новостями одно для получения новостей из USA второе из Ukraine.
-// Под эти апи создано по два интерфейса и по два класса. Переделайте это в namespaces.
-
-// News api USA
-interface INews {
-    id: number;
-    title: string;
-    text: string;
-    author: string;
-}
-
+let User = class User {
+};
+User = __decorate([
+    addUserDecorator('user')
+], User);
+const user = new User();
 class NewsService {
-    protected apiurl: string = 'https://news_api_usa_url'
-    public getNews() {} // method
+    constructor() {
+        this.apiurl = 'https://news_api_usa_url';
+    }
+    getNews() { } // method
 }
-
-// News api Ukraine
-interface INews2 {
-    uuid: string;
-    title: string;
-    body: string;
-    author: string;
-    date: string;
-    imgUrl: string;
-}
-
 class NewsService2 {
-    protected apiurl: string = 'https://news_api_2_url'
-    public getNews() {} // method get all news
-    public addToFavorite() {} // method add to favorites
-}
-
-namespace ApiNews {
-    export interface INews {
-        id: number;
-        title: string;
-        text: string;
-        author: string;
+    constructor() {
+        this.apiurl = 'https://news_api_2_url';
     }
-
-    export interface INews2 {
-        uuid: string;
-        title: string;
-        body: string;
-        author: string;
-        date: string;
-        imgUrl: string;
-    }
+    getNews() { } // method get all news
+    addToFavorite() { } // method add to favorites
 }
-
 // 4.Есть два класса Junior и Middle создайте класс Senior который будет имплементировать 
 // этих два класса а также у него будет еще свой метод createArchitecture 
 // реализация данного метода может быть произвольной.
-
 class Junior {
     doTasks() {
         console.log('Actions!!!');
     }
 }
-
 class Middle {
     createApp() {
         console.log('Creating!!!');
     }
 }
-
-class Senior implements Junior, Middle {
-    public doTasks() {
+class Senior {
+    doTasks() {
         console.log('Actions!!!');
     }
-    public createApp() {
+    createApp() {
         console.log('Creating!!!');
     }
-    public createArchitecture() {
-        console.log('Architecture!!!')
+    createArchitecture() {
+        console.log('Architecture!!!');
     }
 }
-
-applyMixins(Senior, [Junior, Middle]) 
-
-function applyMixins(targetClass: any, baseClass: any[]) {
+applyMixins(Senior, [Junior, Middle]);
+function applyMixins(targetClass, baseClass) {
     baseClass.forEach(baseClass => {
         Object.getOwnPropertyNames(baseClass.prototype).forEach(name => {
             targetClass.prototype[name] = baseClass.prototype[name];
         });
     });
 }
-
-const developer = new Senior()
-
+const developer = new Senior();
